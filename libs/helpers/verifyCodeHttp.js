@@ -81,3 +81,13 @@ const STATUS_HTTP = [
 export function getStatusCodeRequest(statusCodeRequest) {
     return STATUS_HTTP.find(STATUS_HTTP => STATUS_HTTP.status === statusCodeRequest);
 }
+
+/**
+ * Method used to get the message request code 
+ * 
+ * @param String statusCode
+ * @returns String
+ */
+export function getMessageStatusCode(statusCode) {
+	return getStatusCodeRequest(statusCode).msg;
+}
