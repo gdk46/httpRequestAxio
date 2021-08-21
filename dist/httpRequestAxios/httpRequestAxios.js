@@ -2,16 +2,16 @@ import * as axios from 'axios';
 import { getMessageStatusCode } from '../../libs/helpers/verifyCodeHttp';
 
 /**
- * Get request method
+ * Get method
  *
- * @param string url
- * @param function callback Function to be performed on success
+ * @param string url Endpoint for resource
+ * @param null|function callback Function to be performed on success
  */
-export function requestGet(url, callback) {
+export function get(url, callback = null) {
     axios
         .get(url)
         .then((response) => {
-            return callback(response);
+            return callback == null ? response : callback(response);
         })
         .catch((error) => {
             if (error.response) {
@@ -21,7 +21,7 @@ export function requestGet(url, callback) {
                     message: getMessageStatusCode(error.response.status),
                     statusText: error.response.statusText,
                 }
-            }else {
+            } else {
                 return {
                     error: error.message,
                 }
@@ -30,17 +30,17 @@ export function requestGet(url, callback) {
 }
 
 /**
- * método de requisição get com passagem de parâmetros
+ * Get request method with parameter passing
  * 
- * @param string url 
- * @param object|string data
- * @param function callback Function to be performed on successs
+ * @param string url Endpoint for resource
+ * @param object|string data Data passed by the request body
+ * @param null|function callback Function to be performed on successs
  */
-export function requestGetWithParam(url, data, callback) {
+export function getParam(url, data, callback = null) {
     axios
-        .get(url, data)
+        .get(url, {data})
         .then((response) => {
-            return callback(response);
+            return callback == null ? response : callback(response);
         })
         .catch((error) => {
             if (error.response) {
@@ -50,7 +50,7 @@ export function requestGetWithParam(url, data, callback) {
                     message: getMessageStatusCode(error.response.status),
                     statusText: error.response.statusText,
                 }
-            }else {
+            } else {
                 return {
                     error: error.message,
                 }
