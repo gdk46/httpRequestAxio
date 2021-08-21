@@ -65,7 +65,7 @@ export function getParam(url, data, callback = null) {
  * @param object data Data passed by the request body
  * @param null|function callback Function to be performed on successs
  */
-export function getParam(url, data, callback = null) {
+export function post(url, data, callback = null) {
     axios
         .get(url, {data})
         .then((response) => {
