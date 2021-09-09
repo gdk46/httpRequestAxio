@@ -1,88 +1,122 @@
+//! httpRequestAxios.js
+//! version : 1.0.2
+//! authors : Gleisson Neves,
+//! license : MIT
+
 import * as axios from 'axios';
-import { getMessageStatusCode } from '../../libs/helpers/verifyCodeHttp';
 
 /**
  * Get resquest method
  *
- * @param string url Endpoint for resource
- * @param null|function callback Function to be performed on success
+ * @param { String } url Endpoint for resource
+ * @param { Null, Function } callback Function to be performed on success
+ * @return Object
  */
 export function get(url, callback = null) {
     axios
-        .get(url)
-        .then((response) => {
-            return callback == null ? response : callback(response);
-        })
-        .catch((error) => {
-            if (error.response) {
-                return {
-                    data: error.response.data,
-                    code: error.response.status,
-                    message: getMessageStatusCode(error.response.status),
-                    statusText: error.response.statusText,
-                }
-            } else {
-                return {
-                    error: error.message,
-                }
+      .get(url)
+      .then((response) => {
+          if (callback === null) {
+            const resp = {
+              data: response.data,
+              code: response.status,
+              message: response.statusText,
             }
-        });
+
+            return resp;
+          } else {
+            return callback(response);
+          }
+      })
+      .catch((error) => {
+        if (error.response) {
+          return {
+            data: error.response.data,
+            code: error.response.status,
+            message: error.response.statusText,
+          }
+        } else {
+          return {
+              error: error.message,
+          }
+        }
+      });
 }
 
 /**
  * Get request method with parameter passing
- * 
- * @param string url Endpoint for resource
- * @param object data Data passed by the request body
- * @param null|function callback Function to be performed on successs
+ *
+ * @param { String } url Endpoint for resource
+ * @param { Object } data Data passed by the request body
+ * @param { Null, Function } callback Function to be performed on success
+ * @return Object
  */
 export function getParam(url, data, callback = null) {
     axios
-        .get(url, {data})
-        .then((response) => {
-            return callback == null ? response : callback(response);
-        })
-        .catch((error) => {
-            if (error.response) {
-                return {
-                    data: error.response.data,
-                    code: error.response.status,
-                    message: getMessageStatusCode(error.response.status),
-                    statusText: error.response.statusText,
-                }
-            } else {
-                return {
-                    error: error.message,
-                }
-            }
-        });
+      .get(url, {data})
+      .then((response) => {
+        if (callback === null) {
+          const resp = {
+            data: response.data,
+            code: response.status,
+            message: response.statusText,
+          }
+
+          return resp;
+        } else {
+          return callback(response);
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          return {
+            data: error.response.data,
+            code: error.response.status,
+            message: error.response.statusText,
+          }
+        } else {
+          return {
+            error: error.message,
+          }
+        }
+      });
 }
 
 /**
  * POST request method
  *
- * @param string url Endpoint for resource
- * @param object data Data passed by the request body
- * @param null|function callback Function to be performed on successs
+ * @param { String } url Endpoint for resource
+ * @param { Object } data Data passed by the request body
+ * @param { Null, Function } callback Function to be performed on success
+ * @return Object
  */
 export function post(url, data, callback = null) {
     axios
-        .get(url, {data})
-        .then((response) => {
-            return callback == null ? response : callback(response);
-        })
-        .catch((error) => {
-            if (error.response) {
-                return {
-                    data: error.response.data,
-                    code: error.response.status,
-                    message: getMessageStatusCode(error.response.status),
-                    statusText: error.response.statusText,
-                }
-            } else {
-                return {
-                    error: error.message,
-                }
-            }
-        });
+      .post(url, {data})
+      .then((response) => {
+        if (callback === null) {
+          const resp = {
+            data: response.data,
+            code: response.status,
+            message: response.statusText,
+          }
+
+          return resp;
+        } else {
+          return callback(response);
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          return {
+            data: error.response.data,
+            code: error.response.status,
+            message: error.response.statusText,
+          }
+        } else {
+          return {
+            error: error.message,
+          }
+        }
+      });
 }
