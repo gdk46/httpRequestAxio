@@ -1,4 +1,3 @@
-
 import qs from 'qs'
 
 
@@ -7,6 +6,8 @@ const dataProcessingByRequestMethod = (data)=> {
   return {
     post: qs.stringify(data),
     get: data || {},
+    put: data,
+    delete: data,
   }
 }
 
@@ -19,18 +20,34 @@ const checkCompatibilityOfRequestMethods = (method) => {
     delete: 'delete',
   }
 
-  return httpVerbs[method] || 'requisition method not accepted'
+  if(httpVerbs[method]) {
+    return httpVerbs[method]
+  }
+
+  throw new 'Invalid  HTTP method'
 }
 
-function configAxio({httpMethod = 'get', data = {}, url, timeout = 1000}) {
-  const compatibilityOfRequestMethods = checkCompatibilityOfRequestMethods(httpMethod)
-  const dataProcessingMethod = dataProcessingByRequestMethod(data),
+// configura o header do axios
+function settingRequest(setting) {
+  return {
+    httpMethod: setting.method || 'get',
+    data: setting.data || {},
+    url: setting.url || '',
+    timeout: setting.timeout || 1000
+  }
+}
 
-  /* return {
-    method: compatibilityOfRequestMethods[setting.httpMethod],
-    url: setting.url,
-    data: dataProcessingMethod[setting.httpMethod],
+
+export default function settingAxio(setting) {
+  const { httpMethod, data, url, timeout } = settingRequest(setting) 
+  const method = checkCompatibilityOfRequestMethods(httpMethod)
+  const dataRequest = dataProcessingByRequestMethod(data)
+
+  return {
+    method: method,
+    url: url,
+    data: dataRequest[httpMethod],
     headers: {'X-Requested-With': 'XMLHttpRequest'},
-    timeout: setting.timeout,
-  } */
+    timeout: timeout,
+  }
 }
