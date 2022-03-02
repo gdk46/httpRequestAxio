@@ -4,78 +4,105 @@
 //! license : MIT
 //! https://github.com/gleissonneves/httpRequestAxio/
 
-import qs from 'qs'
+import qs from "qs";
 
-import  { CONFIG_AXIOS } from './constants'
+/**
+ * Handles the return data per request
+ *
+ * @param { Object } data return data
+ * @returns { Object }
+ */
+const dataProcessingByRequestMethod = (data) => {
+  return {
+    post: qs.stringify(data),
+    get: data || {},
+    put: data,
+    delete: data,
+  };
+};
 
-// trata os dados de envio por requisição
-const dataProcessingByRequestMethod = (data)=> {
-    return {
-        post: qs.stringify(data),
-        get: data || {},
-        put: data,
-        delete: data,
-    }
-}
+/**
+ * valid the compatibility of the verb passed
+ * with what is accepted by the abstraction
+ *
+ * @param { String } verb verb http
+ * @returns { String }
+ */
+const checkCompatibilityOfRequestVerbsHTTP = (verb) => {
+  const httpVerbs = {
+    post: "post",
+    get: "get",
+    put: "put",
+    delete: "delete",
+  };
 
-// valida a compatibilidade do metodo com o que é aceitos pela abstração
-const checkCompatibilityOfRequestVerbsHTTP = (method) => {
-    const httpVerbs = {
-        post: 'post',
-        get: 'get',
-        put: 'put',
-        delete: 'delete',
-    }
+  if (httpVerbs[verb]) {
+    return httpVerbs[verb];
+  }
 
-    if(httpVerbs[method]) {
-        return httpVerbs[method]
-    }
+  throw new "Invalid HTTP verb"();
+};
 
-    throw new 'Invalid HTTP verb';
-}
+/**
+ * configure basic data basic header
+ *
+ * @param { Object } setting user defined settings
+ * @return { Object }
+ */
+const configureDataHeader = (setting) => {
+  return {
+    httpVerb: setting.method
+      ? checkCompatibilityOfRequestVerbsHTTP(setting.method)
+      : "get",
+    data: setting.data || {},
+    url: setting.url || "",
+    timeout: setting.timeout || 10000,
+  };
+};
 
-// configura o header do axios
-function settingRequest(setting) {
-    return {
-        httpMethod: setting.method || 'get',
-        data: setting.data || {},
-        url: setting.url || '',
-        timeout: setting.timeout || 5000
-    }
-}
+/**
+ *
+ * @params {}
+ * @return { Object }
+ */
+const settingParamsByVerbHTTP = (object) => {
+  if (object.method === "get") {
+    object.params = object.data;
+    delete object.data;
+    return object;
+  }
 
+  delete object.params;
+  return object;
+};
 
-function settingParamsByVerbHTTP() {
-    // TODO: add verificações
-    return { params: undefined }
-}
+/**
+ *
+ * @params {}
+ * @return { Object }
+ */
+const assign = (previousValue) => {
+  const currentValue = Object.assign(previousValue, { params: undefined });
+  return settingParamsByVerbHTTP(currentValue);
+};
 
-function assign(previousValue) {
-    const { method } = previousValue;
-    const currentValue = settingParamsByVerbHTTP(method)
-    const assignValue = Object.assign(previousValue, currentValue)
+/**
+ * Configure a basic header
+ *
+ * @params { Object } setting
+ * @return { Object }
+ */
+const settingAxio = (setting) => {
+  const { httpVerb, data, url, timeout } = configureDataHeader(setting);
+  const dataRequest = dataProcessingByRequestMethod(data);
 
-    if(method === 'get') {
-        assignValue.params = assignValue.data
-        delete assignValue.data
-    } else {
-        delete assignValue.params
-    }
+  return assign({
+    headers: { "X-Requested-With": "XMLHttpRequest" },
+    method: httpVerb,
+    url: url,
+    data: dataRequest[httpVerb],
+    timeout: timeout,
+  });
+};
 
-    return assignValue
-}
-
-export default function settingAxio(setting) {
-    const { httpMethod, data, url, timeout } = settingRequest(setting)
-    const method = checkCompatibilityOfRequestVerbsHTTP(httpMethod)
-    const dataRequest = dataProcessingByRequestMethod(data)
-    const mountDefaultVerbHTTP = {
-        ...CONFIG_AXIOS,
-        method: method,
-        url: url,
-        data: dataRequest[httpMethod],
-        timeout: timeout,
-    }
-
-    return assign(mountDefaultVerbHTTP);
-}
+export default settingAxio;
